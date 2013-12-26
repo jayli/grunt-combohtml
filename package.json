@@ -1,7 +1,7 @@
 {
   "name": "grunt-combohtml",
   "description": "combine build html with ssi.",
-  "version": "0.1.10",
+  "version": "0.1.11",
   "homepage": "",
   "author": {
     "name": "bachi",
@@ -28,7 +28,8 @@
     "grunt": "~0.4.1"
   },
   "dependencies": {
-    "iconv-lite": ""
+    "iconv-lite": "",
+	"civet":""
   },
   "peerDependencies": {
     "grunt": "~0.4.1"

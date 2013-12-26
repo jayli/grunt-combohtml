@@ -1,6 +1,7 @@
 
 var spawn = require('child_process').spawn;
 var fs = require('fs');
+var js_beautify = require("./beautify").js_beautify;
 /*
 
  Style HTML

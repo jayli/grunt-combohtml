@@ -33,6 +33,8 @@ grunt.initConfig({
 				from:/src\//,
 				to:'build/'
 			},
+			convert2vm:true,// 是否将juicer语法块转换为vm格式
+			convert2php:true,// 是否将juicer语法块转换为php格式
 			comboJS:true, // 是否静态合并当前页面引用的本地js
 			comboCSS:true // 是否静态合并当前页面引用的css
 		},  

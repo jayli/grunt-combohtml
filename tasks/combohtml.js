@@ -1,5 +1,5 @@
 /*
- * 
+ * Modifyed @ 2013-12-26 代码很乱，需要重构
  *
  * Copyright (c) 2013 拔赤
  * Licensed under the MIT license.
@@ -17,17 +17,16 @@ var ssi = require('./ssi').ssi,
 var isUtf8 = require('./is-utf8');
 var iconv = require('iconv-lite');
 var tidy = require('./tidy');
+var civet = require('civet');
 var extract = require('./extract');
 var concat = require('./concat').concat;
 
 module.exports = function(grunt) {
 
-	// Please see the Grunt documentation for more information regarding task
-	// creation: http://gruntjs.com/creating-tasks
-
 	grunt.registerMultiTask('combohtml', 'combohtml.', function() {
 		// Merge task-specific and/or target-specific options with these defaults.
 		var options = this.options();
+		var sholdtidy = true;
 
 		var that = this;
 		var pwd = process.cwd();
@@ -49,6 +48,7 @@ module.exports = function(grunt) {
 				comboJS:typeof options.comboJS == 'undefined' || options.comboJS === true,
 				comboCSS:typeof options.comboCSS == 'undefined' || options.comboCSS === true
 			});
+
 			chunk = result.content;
 
 			if(typeof options.comboJS == 'undefined' || options.comboJS === true){
@@ -61,10 +61,24 @@ module.exports = function(grunt) {
 			if(typeof options.comboJS == 'undefined' || options.comboJS === true){
 				chunk = chunk.replace('@@script',path.basename(v.dest,path.extname(v.dest)) + '.js');
 			}
+
 			if(typeof options.comboCSS == 'undefined' || options.comboCSS === true){
 				chunk = chunk.replace('@@style',path.basename(v.dest,path.extname(v.dest)) + '.css');
 			}
-			chunk = tidy(chunk);
+
+			if(typeof options.convert2vm !== "undefined" || options.convert2vm == true){
+				outputVmFile(chunk,filep);
+				sholdtidy = false;
+			}
+
+			if(typeof options.convert2php !== "undefined" || options.convert2php == true){
+				outputPhpFile(chunk,filep);
+				sholdtidy = false;
+			}
+
+			if(sholdtidy){
+				chunk = tidy(chunk);
+			}
 
 			if(!(chunk instanceof Buffer)){
 				chunk = new Buffer(chunk);
@@ -80,6 +94,25 @@ module.exports = function(grunt) {
 	});
 
 };
+
+function outputVmFile(content,fp){
+	var ctxt = civet.juicer2vm(content);
+    fs.writeFileSync(fp + '.vm', ctxt);
+}
+
+function outputPhpFile(content,fp){
+	var ctxt = civet.juicer2php(content);
+    fs.writeFileSync(fp + '.php', ctxt);
+}
+
+function writeFile(page, prjInfo, pageContent) {
+    var pagePathDir = path.dirname(page);
+    if (prjInfo.charset[0].match(/gbk/i)) {
+        pageContent = iconv.encode(pageContent, 'gbk');
+    }   
+    fs.writeFileSync(page, pageContent);
+    return;
+}
 
 
 function consoleColor(str,num){
@@ -126,7 +159,6 @@ function getDirFiles(dir){
 			res_d.push(file);
 		}   
 	});
-
 	
 	r += '<p><img src="http://img02.taobaocdn.com/tps/i2/T1WNlnFadjXXaSQP_X-16-16.png" /> <a href="../">parent dir</a></p><hr size=1 />';
 
