@@ -76,6 +76,11 @@ module.exports = function(grunt) {
 				sholdtidy = false;
 			}
 
+			if(typeof options.convert2tms !== "undefined" || options.convert2tms == true){
+				outputTmsFile(chunk,filep);
+				sholdtidy = false;
+			}
+
 			if(sholdtidy){
 				chunk = tidy(chunk);
 			}
@@ -97,12 +102,17 @@ module.exports = function(grunt) {
 
 function outputVmFile(content,fp){
 	var ctxt = civet.juicer2vm(content);
-    fs.writeFileSync(fp + '.vm', ctxt);
+    fs.writeFileSync(fp + '.vm.html', ctxt);
 }
 
 function outputPhpFile(content,fp){
 	var ctxt = civet.juicer2php(content);
-    fs.writeFileSync(fp + '.php', ctxt);
+    fs.writeFileSync(fp + '.php.html', ctxt);
+}
+
+function outputTmsFile(content,fp){
+	var ctxt = civet.juicer2vm(content);
+    fs.writeFileSync(fp + '.tms.html', ctxt);
 }
 
 function writeFile(page, prjInfo, pageContent) {
