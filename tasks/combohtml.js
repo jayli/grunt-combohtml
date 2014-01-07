@@ -66,17 +66,17 @@ module.exports = function(grunt) {
 				chunk = chunk.replace('@@style',path.basename(v.dest,path.extname(v.dest)) + '.css');
 			}
 
-			if(typeof options.convert2vm !== "undefined" || options.convert2vm == true){
+			if(typeof options.convert2vm == "undefined" || options.convert2vm == true){
 				outputVmFile(chunk,filep);
 				sholdtidy = false;
 			}
 
-			if(typeof options.convert2php !== "undefined" || options.convert2php == true){
+			if(typeof options.convert2php == "undefined" || options.convert2php == true){
 				outputPhpFile(chunk,filep);
 				sholdtidy = false;
 			}
 
-			if(typeof options.convert2tms !== "undefined" || options.convert2tms == true){
+			if(typeof options.convert2tms == "undefined" || options.convert2tms == true){
 				outputTmsFile(chunk,filep);
 				sholdtidy = false;
 			}
