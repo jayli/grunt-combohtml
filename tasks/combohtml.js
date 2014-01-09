@@ -19,6 +19,7 @@ var iconv = require('iconv-lite');
 var tidy = require('./tidy');
 var civet = require('civet');
 var extract = require('./extract');
+var relativeParse = require('./relative').parse;
 var concat = require('./concat').concat;
 
 module.exports = function(grunt) {
@@ -44,26 +45,34 @@ module.exports = function(grunt) {
 			// 一定是utf8格式的
 			var chunk = ssiChunk(p,bf.toString('utf8'));
 
-			var result = extract.parse(chunk,{
-				comboJS:typeof options.comboJS == 'undefined' || options.comboJS === true,
-				comboCSS:typeof options.comboCSS == 'undefined' || options.comboCSS === true
-			});
+			// TODO: 这里的逻辑需要重构了
+			if(typeof options.relative !== "undefined"){
+				// 相对路径编译成绝对路径
+				chunk = relativeParse(chunk,options.relative,filep).content;
+			} else {
+				// 相对路径执行静态合并
+				var result = extract.parse(chunk,{
+					comboJS:typeof options.comboJS == 'undefined' || options.comboJS === true,
+					comboCSS:typeof options.comboCSS == 'undefined' || options.comboCSS === true
+				});
 
-			chunk = result.content;
+				chunk = result.content;
 
-			if(typeof options.comboJS == 'undefined' || options.comboJS === true){
-				var js_content = concat(result.js,dest_js,v.orig.cwd,p,options.replacement);
-			}
-			if(typeof options.comboCSS == 'undefined' || options.comboCSS === true){
-				var css_content = concat(result.css,dest_css,v.orig.cwd,p,options.replacement);
-			}
-			
-			if(typeof options.comboJS == 'undefined' || options.comboJS === true){
-				chunk = chunk.replace('@@script',path.basename(v.dest,path.extname(v.dest)) + '.js');
-			}
+				if(typeof options.comboJS == 'undefined' || options.comboJS === true){
+					var js_content = concat(result.js,dest_js,v.orig.cwd,p,options.replacement);
+				}
+				if(typeof options.comboCSS == 'undefined' || options.comboCSS === true){
+					var css_content = concat(result.css,dest_css,v.orig.cwd,p,options.replacement);
+				}
+				
+				if(typeof options.comboJS == 'undefined' || options.comboJS === true){
+					chunk = chunk.replace('@@script',path.basename(v.dest,path.extname(v.dest)) + '.js');
+				}
 
-			if(typeof options.comboCSS == 'undefined' || options.comboCSS === true){
-				chunk = chunk.replace('@@style',path.basename(v.dest,path.extname(v.dest)) + '.css');
+				if(typeof options.comboCSS == 'undefined' || options.comboCSS === true){
+					chunk = chunk.replace('@@style',path.basename(v.dest,path.extname(v.dest)) + '.css');
+				}
+
 			}
 
 			if(typeof options.convert2vm == "undefined" || options.convert2vm == true){

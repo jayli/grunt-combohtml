@@ -33,8 +33,10 @@ grunt.initConfig({
 				from:/src\//,
 				to:'build/'
 			},
-			convert2vm:true,// 是否将juicer语法块转换为vm格式
-			convert2php:true,// 是否将juicer语法块转换为php格式
+			relative:'http://g.tbcdn.cn/group/trip/1.2.3/',// 本地资源文件名替换的前缀
+			convert2vm:false,// 是否将juicer语法块转换为vm格式
+			convert2php:false,// 是否将juicer语法块转换为php格式
+			convert2tms:false,// 是否将juicer语法块转换为php格式
 			comboJS:true, // 是否静态合并当前页面引用的本地js
 			comboCSS:true // 是否静态合并当前页面引用的css
 		},  
@@ -54,6 +56,8 @@ grunt.initConfig({
 });
 
 ```
+
+> relative和comboJS与comboCSS的配置互斥
 
 ## 执行任务
 
