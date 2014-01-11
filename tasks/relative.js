@@ -149,18 +149,18 @@ function getFirstIncludes(content,type,relative,filep){
 					var alp = relative + 
 								path.join(path.dirname(filep).
 									split(path.sep).join('/').replace(/^build\//,''),
-										args[1].replace(/\.js$/,'-min.js'));
+										args[1].replace(/\.js$/,'-min.js')).split(path.sep).join('/');
 					str = '<!--js:'+alp+'-->';
 				} else {
 					str = '<!--js:'+args[1]+'-->';
 				}
 			} else if(type === 'css'){
 				if(!/http:/i.test(args[1]) && /stylesheet/i.test(args[0])){
+					
 					var alp = relative + 
 								path.join(path.dirname(filep).
 									split(path.sep).join('/').replace(/^build\//,''), 
-										args[1].replace(/\.css$/,'-min.css'));
-					// console.log(relative);
+										args[1].replace(/\.css$/,'-min.css')).split(path.sep).join('/');
 					str = '<!--css:'+alp+'-->';
 				} else {
 					str = '{!--link:'+args[0].replace('<link','!link')+'--}';
