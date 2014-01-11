@@ -82,6 +82,7 @@ function insertScript(content){
 
 function recall(content){
 
+	//return content;
 	content = content.replace(new RegExp('(<!--css:([^>]*?)-->)','gi'),function(){
 		var args = arguments;
 		if(/http:/i.test(args[2])){
@@ -101,6 +102,11 @@ function recall(content){
 		} else {
 			return args[0];
 		}
+	});
+
+	content = content.replace(new RegExp('({!--link:([^}]*?)--})','gi'),function(){
+		var args = arguments;
+		return args[2].replace('!link','<link');
 	});
 
 	return content;
@@ -140,18 +146,24 @@ function getFirstIncludes(content,type,relative,filep){
 			var str = '';
 			if(type === 'js'){
 				if(!/http:/i.test(args[1])){
-					var alp = relative + path.join(path.dirname(filep).replace(/^build\//,''),args[1].replace(/\.js$/,'-min.js'));
+					var alp = relative + 
+								path.join(path.dirname(filep).
+									split(path.sep).join('/').replace(/^build\//,''),
+										args[1].replace(/\.js$/,'-min.js'));
 					str = '<!--js:'+alp+'-->';
 				} else {
 					str = '<!--js:'+args[1]+'-->';
 				}
 			} else if(type === 'css'){
-				if(!/http:/i.test(args[1])){
-					var alp = relative + path.join(path.dirname(filep).replace(/^build\//,''),args[1].replace(/\.css$/,'-min.css'));
+				if(!/http:/i.test(args[1]) && /stylesheet/i.test(args[0])){
+					var alp = relative + 
+								path.join(path.dirname(filep).
+									split(path.sep).join('/').replace(/^build\//,''), 
+										args[1].replace(/\.css$/,'-min.css'));
 					// console.log(relative);
 					str = '<!--css:'+alp+'-->';
 				} else {
-					str = '<!--css:'+args[1]+'-->';
+					str = '{!--link:'+args[0].replace('<link','!link')+'--}';
 				}
 			}
 			return str;	
