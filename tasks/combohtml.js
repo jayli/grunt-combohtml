@@ -12,6 +12,7 @@ var ssi = require('./ssi').ssi,
 	ssiChunk = require('./ssi').ssiChunk,
 	events = require('events'),
 	url  = require('url'),
+	chunkParser = require('./chunk').parse,
 	path = require('path');
 
 var isUtf8 = require('./is-utf8');
@@ -28,6 +29,8 @@ module.exports = function(grunt) {
 		// Merge task-specific and/or target-specific options with these defaults.
 		var options = this.options();
 		var sholdtidy = true;
+
+		var done = this.async();
 
 		var that = this;
 		var pwd = process.cwd();
@@ -64,7 +67,7 @@ module.exports = function(grunt) {
 				if(typeof options.comboCSS == 'undefined' || options.comboCSS === true){
 					var css_content = concat(result.css,dest_css,v.orig.cwd,p,options.replacement);
 				}
-				
+
 				if(typeof options.comboJS == 'undefined' || options.comboJS === true){
 					chunk = chunk.replace('@@script',path.basename(v.dest,path.extname(v.dest)) + '.js');
 				}
@@ -85,29 +88,45 @@ module.exports = function(grunt) {
 				sholdtidy = false;
 			}
 
-			if(typeof options.convert2tms == "undefined" || options.convert2tms == true){
-				outputTmsFile(chunk,filep);
-				sholdtidy = false;
+			if(sholdtidy && options.tidy){
+				chunk = tidy(chunk,{
+			      'indent_size': 4,
+			      'indent_char': ' ',
+			      'brace_style': 'expand',
+			      'unformatted': ['a', 'sub', 'sup', 'b', 'i', 'u','script']
+				});
 			}
 
-			if(sholdtidy){
-				chunk = tidy(chunk);
-			}
-
-			if(!(chunk instanceof Buffer)){
-				chunk = new Buffer(chunk);
-			}
-			if(options.encoding == 'gbk'){
-				chunk = iconv.encode(iconv.decode(chunk, 'utf8'),'gbk');
-			}
-
-			fs.writeFileSync(v.dest,chunk);
+			chunkParser(chunk,function(chunk){
+				chunk = teardownChunk(chunk,options.encoding);
+				if(!(chunk instanceof Buffer)){
+					chunk = new Buffer(chunk);
+				}
+				if(options.encoding == 'gbk'){
+					chunk = iconv.encode(iconv.decode(chunk, 'utf8'),'gbk');
+				}
+				fs.writeFileSync(v.dest,chunk);
+				done();
+			});
 			
 		});
+
+        done();
 		return;
 	});
 
 };
+
+// 传入的chunk一定是utf8的
+function teardownChunk(chunk,encoding){
+	if(!(chunk instanceof Buffer)){
+		chunk = new Buffer(chunk);
+	}
+	if(encoding == 'gbk'){
+		chunk = iconv.encode(iconv.decode(chunk, 'utf8'),'gbk');
+	}
+	return chunk;
+}
 
 function outputVmFile(content,fp){
 	var ctxt = civet.juicer2vm(content);
@@ -117,11 +136,6 @@ function outputVmFile(content,fp){
 function outputPhpFile(content,fp){
 	var ctxt = civet.juicer2php(content);
     fs.writeFileSync(fp + '.php.html', ctxt);
-}
-
-function outputTmsFile(content,fp){
-	var ctxt = civet.juicer2vm(content);
-    fs.writeFileSync(fp + '.tms.html', ctxt);
 }
 
 function writeFile(page, prjInfo, pageContent) {
