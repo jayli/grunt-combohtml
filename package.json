@@ -1,7 +1,7 @@
 {
   "name": "grunt-combohtml",
   "description": "combine build html with ssi.",
-  "version": "0.1.18",
+  "version": "0.1.19",
   "homepage": "",
   "author": {
     "name": "bachi",
@@ -44,6 +44,6 @@
   "dist": {
     "shasum": "ecf31988faa90dc8dc65d2d6bf2c4db48e639cd3"
   },
-  "readme": "# grunt-combohtml\r\n\r\n合并带有SSI的html代码，并提取其中引用的本地css和js，将他们合并为一个js和一个css，并输出构建好的html\r\n\r\n## Getting Started\r\n\r\n依赖 Grunt 版本`~0.4.1`\r\n\r\n安装\r\n\r\n```shell\r\nnpm install grunt-combohtml --save-dev\r\n```\r\n\r\n安装后，在Gruntfile.js中载入任务\r\n\r\n```js\r\ngrunt.loadNpmTasks('grunt-combohtml');\r\n```\r\n\r\n## 任务配置\r\n\r\n### 步骤\r\n\r\n在`grunt.initConfig()`中添加combohtml的配置：\r\n\r\n```js\r\ngrunt.initConfig({\r\n\tcombohtml:{\r\n\t\toptions:{\r\n\t\t\tencoding:'utf8',//输出文件编码\r\n\t\t\treplacement:{\t\t// 抓取js/css文件时路径替换规则，留空为不替换\r\n\t\t\t\tfrom:/src\\//,\r\n\t\t\t\tto:'build/'\r\n\t\t\t},\r\n\t\t\trelative:'http://g.tbcdn.cn/group/trip/1.2.3/',// 本地资源文件名替换的前缀\r\n\t\t\tconvert2vm:false,// 是否将juicer语法块转换为vm格式\r\n\t\t\tconvert2php:false,// 是否将juicer语法块转换为php格式\r\n\t\t\tconvert2tms:false,// 是否将juicer语法块转换为php格式\r\n\t\t\tcomboJS:true, // 是否静态合并当前页面引用的本地js\r\n\t\t\tcomboCSS:true // 是否静态合并当前页面引用的css\r\n\t\t},  \r\n\t\tmain:{\r\n\t\t\tfiles: [\r\n\t\t\t\t{   \r\n\t\t\t\t\texpand: true,\r\n\t\t\t\t\tcwd:'src',\r\n\t\t\t\t\tsrc: ['**/*.htm'], \r\n\t\t\t\t\tdest: 'build/',\r\n\t\t\t\t\text: '.htm'\r\n\t\t\t\t}   \r\n\t\t\t]   \r\n\t\t}   \r\n\r\n\t}\r\n});\r\n\r\n```\r\n\r\n> relative和comboJS与comboCSS的配置互斥\r\n\r\n## 执行任务\r\n\r\n\ttask.run(['combohtml']);\r\n\r\n## 功能说明\r\n\r\n### SSI \r\n\r\n该服务依赖[jayli-server](https://npmjs.org/package/jayli-server)，支持标准格式的 SSI include\r\n\r\n\t<!--#include virtual=\"file.html\" -->\r\n\r\n",
+  "readme": "# grunt-combohtml\r\n\r\n合并带有SSI的html代码，并提取其中引用的本地css和js，将他们合并为一个js和一个css，并输出构建好的html\r\n\r\n## Getting Started\r\n\r\n依赖 Grunt 版本`~0.4.1`\r\n\r\n安装\r\n\r\n```shell\r\nnpm install grunt-combohtml --save-dev\r\n```\r\n\r\n安装后，在Gruntfile.js中载入任务\r\n\r\n```js\r\ngrunt.loadNpmTasks('grunt-combohtml');\r\n```\r\n\r\n## 任务配置\r\n\r\n### 步骤\r\n\r\n在`grunt.initConfig()`中添加combohtml的配置：\r\n\r\n```js\r\ngrunt.initConfig({\r\n\tcombohtml:{\r\n\t\toptions:{\r\n\t\t\tencoding:'utf8',//输出文件编码\r\n\t\t\treplacement:{\t\t// 抓取js/css文件时路径替换规则，留空为不替换\r\n\t\t\t\tfrom:/src\\//,\r\n\t\t\t\tto:'build/'\r\n\t\t\t},\r\n\t\t\trelative:'http://g.tbcdn.cn/group/trip/1.2.3/',// 本地资源文件名替换的前缀\r\n\t\t\tconvert2vm:false,// 是否将juicer语法块转换为vm格式\r\n\t\t\tconvert2php:false,// 是否将juicer语法块转换为php格式\r\n\t\t\tconvert2tms:false,// 是否将juicer语法块转换为php格式\r\n\t\t\tcomboJS:true, // 是否静态合并当前页面引用的本地js\r\n\t\t\tcomboCSS:true // 是否静态合并当前页面引用的css\r\n\t\t\tcomboExt:'-combo', // 合并后的js和css后缀\r\n\t\t},  \r\n\t\tmain:{\r\n\t\t\tfiles: [\r\n\t\t\t\t{   \r\n\t\t\t\t\texpand: true,\r\n\t\t\t\t\tcwd:'src',\r\n\t\t\t\t\tsrc: ['**/*.htm'], \r\n\t\t\t\t\tdest: 'build/',\r\n\t\t\t\t\text: '.htm'\r\n\t\t\t\t}   \r\n\t\t\t]   \r\n\t\t}   \r\n\r\n\t}\r\n});\r\n\r\n```\r\n\r\n> relative和comboJS与comboCSS的配置互斥\r\n\r\n## 执行任务\r\n\r\n\ttask.run(['combohtml']);\r\n\r\n## 功能说明\r\n\r\n### SSI \r\n\r\n该服务依赖[jayli-server](https://npmjs.org/package/jayli-server)，支持标准格式的 SSI include\r\n\r\n\t<!--#include virtual=\"file.html\" -->\r\n\r\n",
   "_resolved": "https://registry.npmjs.org/grunt-combohtml/-/grunt-combohtml-0.1.18.tgz"
 }

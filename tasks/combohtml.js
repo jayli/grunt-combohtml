@@ -39,11 +39,13 @@ module.exports = function(grunt) {
 			var p = v.src[0];
 			var bf = read(p);
 			var dirname = path.dirname(v.dest);
-			var filep = path.join(dirname,path.basename(v.dest,path.extname(v.dest)));
+            var fDestName = path.basename(v.dest,path.extname(v.dest));
+			var filep = path.join(dirname, fDestName);
+            var ext = options.comboExt || '.combo';
 			// combo后的js地址
-			var dest_js = filep + '.js';
+			var dest_js = filep + ext+ '.js';
 			// combo后的css地址
-			var dest_css = filep + '.css';
+			var dest_css = filep + ext + '.css';
 
 			// 一定是utf8格式的
 			var chunk = ssiChunk(p,bf.toString('utf8'));
@@ -69,11 +71,11 @@ module.exports = function(grunt) {
 				}
 
 				if(typeof options.comboJS == 'undefined' || options.comboJS === true){
-					chunk = chunk.replace('@@script',path.basename(v.dest,path.extname(v.dest)) + '.js');
+					chunk = chunk.replace('@@script', fDestName + ext + '.js');
 				}
 
 				if(typeof options.comboCSS == 'undefined' || options.comboCSS === true){
-					chunk = chunk.replace('@@style',path.basename(v.dest,path.extname(v.dest)) + '.css');
+					chunk = chunk.replace('@@style', fDestName + ext + '.css');
 				}
 
 			}

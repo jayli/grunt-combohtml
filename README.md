@@ -39,6 +39,7 @@ grunt.initConfig({
 			convert2tms:false,// 是否将juicer语法块转换为php格式
 			comboJS:true, // 是否静态合并当前页面引用的本地js
 			comboCSS:true // 是否静态合并当前页面引用的css
+			comboExt: '-combo', // 合并后的js和css后缀
 		},  
 		main:{
 			files: [
