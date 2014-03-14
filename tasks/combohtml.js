@@ -41,7 +41,12 @@ module.exports = function(grunt) {
 			var dirname = path.dirname(v.dest);
             var fDestName = path.basename(v.dest,path.extname(v.dest));
 			var filep = path.join(dirname, fDestName);
-            var ext = options.comboExt || '.combo';
+
+            var ext = '.combo';
+            if(options.comboExt != undefined && options.comboExt != null){
+                ext = options.comboExt;
+            }
+
 			// combo后的js地址
 			var dest_js = filep + ext+ '.js';
 			// combo后的css地址
