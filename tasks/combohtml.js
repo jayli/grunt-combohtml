@@ -8,11 +8,14 @@
 var util = require('util');
 var fs = require('fs');
 var http = require('http');
+var mock = require('./mock.js');
+var Juicer = require("juicer");
 var ssi = require('./ssi').ssi,
 	ssiChunk = require('./ssi').ssiChunk,
 	events = require('events'),
 	url  = require('url'),
 	chunkParser = require('./chunk').parse,
+	combineAssets = require('./url_combine').parse,
 	path = require('path');
 
 var isUtf8 = require('./is-utf8');
@@ -23,6 +26,17 @@ var extract = require('./extract');
 var relativeParse = require('./relative').parse;
 var concat = require('./concat').concat;
 
+// 一定是utf8格式
+function mockFilter(chunk){
+	if(mock.checkDef(chunk)){
+		var pageParam = mock.getMockData(chunk);
+		chunk = Juicer(chunk, pageParam);
+		// chunk = delPageParamArea(chunk);
+		chunk = tidy(chunk);
+	}
+	return chunk;
+}
+
 module.exports = function(grunt) {
 
 	grunt.registerMultiTask('combohtml', 'combohtml.', function() {
@@ -31,6 +45,7 @@ module.exports = function(grunt) {
 		var sholdtidy = true;
 
 		var done = this.async();
+		var comboMapFile = options.comboMapFile;
 
 		var that = this;
 		var pwd = process.cwd();
@@ -59,6 +74,9 @@ module.exports = function(grunt) {
 			if(typeof options.relative !== "undefined"){
 				// 相对路径编译成绝对路径
 				chunk = relativeParse(chunk,options.relative,filep).content;
+				if(options.combineAssets){
+					chunk = combineAssets(chunk,comboMapFile).content;
+				}
 			} else {
 				// 相对路径执行静态合并
 				var result = extract.parse(chunk,{
@@ -105,6 +123,9 @@ module.exports = function(grunt) {
 			}
 
 			chunkParser(chunk,function(chunk){
+				if(options.mockFilter){
+					chunk = mockFilter(chunk);
+				}
 				chunk = teardownChunk(chunk,options.encoding);
 				if(!(chunk instanceof Buffer)){
 					chunk = new Buffer(chunk);
@@ -183,34 +204,6 @@ function log(statCode, url, err) {
   if (err)
     logStr += ' - ' + red(err);
   console.log(logStr);
-}
-
-function getDirFiles(dir){
-	var files = fs.readdirSync(dir);
-	var res_f = []; 
-	var res_d = [];
-	var r = '';
-	files.forEach(function(file){
-		var stat = fs.lstatSync(path.resolve(dir,file));
-
-		if (!stat.isDirectory()){
-			res_f.push(file);
-		} else {
-			res_d.push(file);
-		}   
-	});
-	
-	r += '<p><img src="http://img02.taobaocdn.com/tps/i2/T1WNlnFadjXXaSQP_X-16-16.png" /> <a href="../">parent dir</a></p><hr size=1 />';
-
-	res_d.forEach(function(file){
-		r += '<p><img src="http://img03.taobaocdn.com/tps/i3/T1nHRTFmNXXXaSQP_X-16-16.png" /> <a href="'+file+'/">'+file+'</a></p>';
-	});
-
-	res_f.forEach(function(file){
-		r += '<p><img src="http://img02.taobaocdn.com/tps/i2/T1Y7tPFg8eXXaSQP_X-16-16.png" /> <a href="'+file+'">'+file+'</a></p>';
-	});
-
-	return r;
 }
 
 function isDir(dir){

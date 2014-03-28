@@ -7,7 +7,7 @@ var isUtf8 = require('./is-utf8');
 var iconv = require('iconv-lite');
 
 var scriptExtern = '<script[^>]*? src=[\'"](.+?)[\'"].*<\/script>';
-var styleExtern = '<link[^>]*? href=[\'"](.+?)[\'"].*>';
+var styleExtern = '<link[^>]*? href=[\'"]([^\'"]+\.css)[\'"].*>';
 
 var JS_Files = [];
 var CSS_Files = [];

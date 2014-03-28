@@ -1,6 +1,6 @@
 # grunt-combohtml
 
-合并带有SSI的html代码，并提取其中引用的本地css和js，将他们合并为一个js和一个css，并输出构建好的html
+HTML代码的构建,合并SSI,并提取其中引用的本地css和js，执行动态和静态合并,并输出构建好的html
 
 ## Getting Started
 
@@ -28,37 +28,77 @@ grunt.loadNpmTasks('grunt-combohtml');
 grunt.initConfig({
 	combohtml:{
 		options:{
-			encoding:'utf8',//输出文件编码
-			replacement:{		// 抓取js/css文件时路径替换规则，留空为不替换
+			encoding:'utf8',
+			replacement:{
 				from:/src\//,
 				to:'build/'
 			},
-			relative:'http://g.tbcdn.cn/group/trip/1.2.3/',// 本地资源文件名替换的前缀
+			// 本地文件引用替换为线上地址的前缀
+			relative:'http://g.tbcdn.cn/path/to/project/',
+			// 配合relative使用,将页面中所有以CDN引用的JS/CSS文件名进行拼合
+			combineAssets: true, 
+			// KISSY Modules Maps File 地址
+			comboMapFile:'http://g.tbcdn.cn/path/to/maps.js',
+			tidy:false,  // 是否重新格式化HTML
+			mockFilter:true, // 是否过滤Demo中的JuicerMock
+			comboJS:false, // 是否静态合并当前页面引用的本地js为一个文件
+			comboCSS:false, // 是否静态合并当前页面引用的css为一个文件
 			convert2vm:false,// 是否将juicer语法块转换为vm格式
-			convert2php:false,// 是否将juicer语法块转换为php格式
-			convert2tms:false,// 是否将juicer语法块转换为php格式
-			comboJS:true, // 是否静态合并当前页面引用的本地js
-			comboCSS:true // 是否静态合并当前页面引用的css
-			comboExt: '-combo', // 合并后的js和css后缀
-		},  
+			convert2php:false, // 是否将juicer语法块转换为php格式
+			comboExt:'-combo' // 静态合并后的js和css后缀
+		},
 		main:{
 			files: [
-				{   
+				{
 					expand: true,
-					cwd:'src',
-					src: ['**/*.htm'], 
-					dest: 'build/',
-					ext: '.htm'
-				}   
-			]   
-		}   
-
+					cwd:'build',
+					// 对'*.php'文件进行HTML合并解析
+					src: ['**/*.php'],
+					dest: 'build/'
+				}
+			]
+		}
 	}
 });
 
 ```
 
-> relative和comboJS与comboCSS的配置互斥
+说明:relative和comboJS与comboCSS的配置互斥
+
+合并文件提供两种模式,代码静态合并,即页面中相对路径引用的资源文件都会被抓取合并为一个:
+
+```
+options:{
+	encoding:'utf8',
+	replacement:{
+		from:/src\//,
+		to:'build/'
+	},
+	comboJS:true, 
+	comboCSS:true,
+	comboExt:'-combo'
+}
+```
+
+若希望页面中引用的相对路径都编译为绝对路径并组成combo的模式`http://url/??a.js,b.js`,需要开始`relative`字段,这时`comboJS`和`comboCSS`字段不起作用
+
+```
+options:{
+	encoding:'utf8',
+	replacement:{
+		from:/src\//,
+		to:'build/'
+	},
+	// 本地文件引用替换为线上地址的前缀
+	relative:'http://g.tbcdn.cn/path/to/project/',
+	// 配合relative使用,将页面中所有以CDN引用的JS/CSS文件名进行拼合
+	combineAssets: true, 
+	// KISSY Modules Maps File 地址,根据需要添加
+	comboMapFile:'http://g.tbcdn.cn/path/to/maps.js'
+}
+```
+
+页面中的 JuicerMock 片段可以通过`mockFilter`字段来配置,原理参照[grunt-flexcombo](http://npmjs.org/grunt-flexcombo)
 
 ## 执行任务
 
