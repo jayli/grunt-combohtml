@@ -141,7 +141,9 @@ module.exports = function(grunt) {
 		});
 
         // HTML 区块代理
-        HTMLFragments.process(options.htmlProxy, options.htmlProxyDestDir, done);
+        if(options.htmlProxy){
+            HTMLFragments.process(options.htmlProxy, options.htmlProxyDestDir, done);
+        }
 
         // done();
 		return;
