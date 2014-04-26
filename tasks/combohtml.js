@@ -25,6 +25,7 @@ var civet = require('civet');
 var extract = require('./extract');
 var relativeParse = require('./relative').parse;
 var concat = require('./concat').concat;
+var HTMLFragments = require('./html-fragments');
 
 // 一定是utf8格式
 function mockFilter(chunk){
@@ -138,6 +139,9 @@ module.exports = function(grunt) {
 			});
 			
 		});
+
+        // HTML 区块代理
+        HTMLFragments.process(options.htmlProxy, options.htmlProxyDestDir, done);
 
         // done();
 		return;
