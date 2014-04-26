@@ -45,7 +45,10 @@ grunt.initConfig({
 			comboCSS:false, // 是否静态合并当前页面引用的css为一个文件
 			convert2vm:false,// 是否将juicer语法块转换为vm格式
 			convert2php:false, // 是否将juicer语法块转换为php格式
-			comboExt:'-combo' // 静态合并后的js和css后缀
+			comboExt:'-combo', // 静态合并后的js和css后缀
+			htmlProxy: '<%= pkg.htmlProxy %>',      // htmlProxy 配置，用于产出线上页面区块替换为本地模块页面
+			htmlProxyDestDir: 'html-fragments'      // html 代理区块页面生成到的目标目录
+			
 		},
 		main:{
 			files: [
@@ -64,6 +67,38 @@ grunt.initConfig({
 ```
 
 说明:relative和comboJS与comboCSS的配置互斥
+
+其中 `htmlProxy` 的配置在 `abc.json` 中指定，这里读取配置，示例配置如下：
+
+  ...
+  ,
+  "htmlProxy": [{
+      "urlReg": "http://tiehang.demo.taobao.net/ksdemo/html-proxy.html", // 要匹配的 url 正则表达式/页面url
+      "replacements": [{	// 需要替换的各个区块和对应的选择器
+          "fragment": "mods/demo/index.html",
+          "selector": "#demo"
+      }]
+  }, {
+      "urlReg": "^http://www.baidu.com/$",
+      "demoPage": "http://www.baidu.com",	// 当urlReg 为正则表达式时，给定一个遵循该正则的示例页面用于做 html 区块合并
+      "replacements": [{
+          "fragment": "mods/demo/index.html",
+          "selector": "#lg"
+      }, {
+          "fragment": "mods/nav/index.html",
+          "selector": "#nv"
+      }]
+  }, {
+      "urlReg": "^http://www.taobao.com/$",
+      "demoPage": "http://www.taobao.com",
+      "replacements": [{
+          "fragment": "mods/demo/index.html",
+          "selector": "#J_Promo"
+      }, {
+          "fragment": "mods/nav/index.html",
+          "selector": "#J_Nav"
+      }]
+  }]
 
 合并文件提供两种模式,代码静态合并,即页面中相对路径引用的资源文件都会被抓取合并为一个:
 
