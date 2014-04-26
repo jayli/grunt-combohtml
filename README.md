@@ -48,7 +48,6 @@ grunt.initConfig({
 			comboExt:'-combo', // 静态合并后的js和css后缀
 			htmlProxy: '<%= pkg.htmlProxy %>',      // htmlProxy 配置，用于产出线上页面区块替换为本地模块页面
 			htmlProxyDestDir: 'html-fragments'      // html 代理区块页面生成到的目标目录
-			
 		},
 		main:{
 			files: [
@@ -70,6 +69,7 @@ grunt.initConfig({
 
 其中 `htmlProxy` 的配置在 `abc.json` 中指定，这里读取配置，示例配置如下：
 
+```js
   ...
   ,
   "htmlProxy": [{
@@ -99,6 +99,7 @@ grunt.initConfig({
           "selector": "#J_Nav"
       }]
   }]
+```
 
 合并文件提供两种模式,代码静态合并,即页面中相对路径引用的资源文件都会被抓取合并为一个:
 
