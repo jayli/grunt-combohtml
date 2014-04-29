@@ -57,7 +57,7 @@ exports.process = function (htmlProxyConfig, outputDir, done) {
                         var replacedHTML = htmlProxy.replaceDom(pageContent, proxyItem.replacements);
                         var encodedHTML = iconv.encode(tidy(replacedHTML), responseCharset);
 
-                        var url2FileName = url.replace(/^http(s)?:\/\//, '').replace(/\/|\./g,'-').substr(0, 20),
+                        var url2FileName = url.replace(/^http(s)?:\/\//, '').replace(/\/|\./g,'-'),
                             fileName = path.join(destDir, url2FileName + '.html');
                         fs.writeFileSync(fileName, encodedHTML);
 
