@@ -147,7 +147,7 @@ module.exports = function(grunt) {
             };
 
             asyncFns.push(asyncFn);
-			
+
 		});
 
         async.parallel(asyncFns, function (err, result) {
@@ -162,8 +162,10 @@ module.exports = function(grunt) {
             } else {
 
                 // HTML 区块代理
-                if(options.htmlProxy){
+                if (options.htmlProxy) {
                     HTMLFragments.process(options.htmlProxy, options.htmlProxyDestDir, done);
+                } else {
+                    done();
                 }
 
             }
@@ -199,7 +201,7 @@ function writeFile(page, prjInfo, pageContent) {
     var pagePathDir = path.dirname(page);
     if (prjInfo.charset[0].match(/gbk/i)) {
         pageContent = iconv.encode(pageContent, 'gbk');
-    }   
+    }
     fs.writeFileSync(page, pageContent);
     return;
 }
