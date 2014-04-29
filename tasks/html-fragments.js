@@ -27,57 +27,56 @@ exports.process = function (htmlProxyConfig, outputDir, done) {
     // 遍历各个需要区块代理的页面，分别做合并任务，push 到 asyncFns 里便于后面并行执行
     htmlProxyConfig.forEach(function (proxyItem) {
 
-        var fn = function (proxyItem) {
+        var fn = function (callback) {
 
-            return function (callback) {
+            var url = proxyItem.demoPage || proxyItem.urlReg;
+            if (url) {
 
-                var url = proxyItem.demoPage || proxyItem.urlReg;
-                if (url) {
+                request({
+                    url: url,
+                    encoding: null
+                }, function (error, response, body) {
 
-                    request({
-                        url: url,
-                        encoding: null
-                    }, function (error, response, body) {
+                    if (!error && response.statusCode == 200) {
 
-                        if (!error && response.statusCode == 200) {
+                        var responseCharset = 'utf8',
+                            responseHeaders = response.headers;
 
-                            var responseCharset = 'utf8',
-                                responseHeaders = response.headers;
+                        // 检测是否响应体为 utf-8 编码，便于后面转码处理
+                        if (responseHeaders['content-type']) {
+                            var contentType = responseHeaders['content-type'],
+                                charsetMatch = contentType.match(/charset=([\w-]+)/ig);
 
-                            // 检测是否响应体为 utf-8 编码，便于后面转码处理
-                            if (responseHeaders['content-type']) {
-                                var contentType = responseHeaders['content-type'],
-                                    charsetMatch = contentType.match(/charset=([\w-]+)/ig);
-
-                                if (charsetMatch && (charsetMatch.length != 0)) {
-                                    responseCharset = charsetMatch[0].split('=')[1];
-                                }
-
+                            if (charsetMatch && (charsetMatch.length != 0)) {
+                                responseCharset = charsetMatch[0].split('=')[1];
                             }
-
-                            var pageContent = iconv.decode(body, responseCharset);
-                            var replacedHTML = htmlProxy.replaceDom(pageContent, proxyItem.replacements);
-                            var encodedHTML = iconv.encode(tidy(replacedHTML), responseCharset);
-
-                            var url2FileName = url.replace(/^http(s)?:\/\//, '').replace(/\/|\./g,'-').substr(0, 20);
-                            fs.writeFileSync(path.join(destDir, url2FileName + '.html'), encodedHTML);
-
-                        } else {
-
-                            console.log('failed to load remote page: ' + url);
 
                         }
 
-                        callback();
+                        var pageContent = iconv.decode(body, responseCharset);
+                        var replacedHTML = htmlProxy.replaceDom(pageContent, proxyItem.replacements);
+                        var encodedHTML = iconv.encode(tidy(replacedHTML), responseCharset);
 
-                    });
-                }
+                        var url2FileName = url.replace(/^http(s)?:\/\//, '').replace(/\/|\./g,'-').substr(0, 20),
+                            fileName = path.join(destDir, url2FileName + '.html');
+                        fs.writeFileSync(fileName, encodedHTML);
 
+                        console.log('>> File "' + fileName + '" created.');
+
+                    } else {
+
+                        console.log('failed to load remote page: ' + url);
+
+                    }
+
+                    callback();
+
+                });
             }
 
         };
 
-        asyncFns.push(fn(proxyItem));
+        asyncFns.push(fn);
 
     });
 
@@ -90,7 +89,7 @@ exports.process = function (htmlProxyConfig, outputDir, done) {
 
         } else {
 
-            console.log('HTML 区块页面已生成到' + destDir);
+            console.log('HTML 区块页面均已生成到 ' + destDir);
 
         }
 

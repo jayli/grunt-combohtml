@@ -26,6 +26,7 @@ var extract = require('./extract');
 var relativeParse = require('./relative').parse;
 var concat = require('./concat').concat;
 var HTMLFragments = require('./html-fragments');
+var async = require('async');
 
 // 一定是utf8格式
 function mockFilter(chunk){
@@ -50,103 +51,125 @@ module.exports = function(grunt) {
 
 		var that = this;
 		var pwd = process.cwd();
+
+        var asyncFns = [];
 		this.files.forEach(function(v,k){
-			console.log(v.dest);
-			var p = v.src[0];
-			var bf = read(p);
-			var dirname = path.dirname(v.dest);
-            var fDestName = path.basename(v.dest,path.extname(v.dest));
-			var filep = path.join(dirname, fDestName);
 
-            var ext = '.combo';
-            if(options.comboExt != undefined && options.comboExt != null){
-                ext = options.comboExt;
-            }
+            var asyncFn = function (callback) {
 
-			// combo后的js地址
-			var dest_js = filep + ext+ '.js';
-			// combo后的css地址
-			var dest_css = filep + ext + '.css';
+                console.log(v.dest);
+                var p = v.src[0];
+                var bf = read(p);
+                var dirname = path.dirname(v.dest);
+                var fDestName = path.basename(v.dest,path.extname(v.dest));
+                var filep = path.join(dirname, fDestName);
 
-			// 一定是utf8格式的
-			var chunk = ssiChunk(p,bf.toString('utf8'));
+                var ext = '.combo';
+                if(options.comboExt != undefined && options.comboExt != null){
+                    ext = options.comboExt;
+                }
 
-			// TODO: 这里的逻辑需要重构了
-			if(typeof options.relative !== "undefined"){
-				// 相对路径编译成绝对路径
-				chunk = relativeParse(chunk,options.relative,filep).content;
-				if(options.combineAssets){
-					chunk = combineAssets(chunk,comboMapFile).content;
-				}
-			} else {
-				// 相对路径执行静态合并
-				var result = extract.parse(chunk,{
-					comboJS:typeof options.comboJS == 'undefined' || options.comboJS === true,
-					comboCSS:typeof options.comboCSS == 'undefined' || options.comboCSS === true
-				});
+                // combo后的js地址
+                var dest_js = filep + ext+ '.js';
+                // combo后的css地址
+                var dest_css = filep + ext + '.css';
 
-				chunk = result.content;
+                // 一定是utf8格式的
+                var chunk = ssiChunk(p,bf.toString('utf8'));
 
-				if(typeof options.comboJS == 'undefined' || options.comboJS === true){
-					var js_content = concat(result.js,dest_js,v.orig.cwd,p,options.replacement);
-				}
-				if(typeof options.comboCSS == 'undefined' || options.comboCSS === true){
-					var css_content = concat(result.css,dest_css,v.orig.cwd,p,options.replacement);
-				}
+                // TODO: 这里的逻辑需要重构了
+                if(typeof options.relative !== "undefined"){
+                    // 相对路径编译成绝对路径
+                    chunk = relativeParse(chunk,options.relative,filep).content;
+                    if(options.combineAssets){
+                        chunk = combineAssets(chunk,comboMapFile).content;
+                    }
+                } else {
+                    // 相对路径执行静态合并
+                    var result = extract.parse(chunk,{
+                        comboJS:typeof options.comboJS == 'undefined' || options.comboJS === true,
+                        comboCSS:typeof options.comboCSS == 'undefined' || options.comboCSS === true
+                    });
 
-				if(typeof options.comboJS == 'undefined' || options.comboJS === true){
-					chunk = chunk.replace('@@script', fDestName + ext + '.js');
-				}
+                    chunk = result.content;
 
-				if(typeof options.comboCSS == 'undefined' || options.comboCSS === true){
-					chunk = chunk.replace('@@style', fDestName + ext + '.css');
-				}
+                    if(typeof options.comboJS == 'undefined' || options.comboJS === true){
+                        var js_content = concat(result.js,dest_js,v.orig.cwd,p,options.replacement);
+                    }
+                    if(typeof options.comboCSS == 'undefined' || options.comboCSS === true){
+                        var css_content = concat(result.css,dest_css,v.orig.cwd,p,options.replacement);
+                    }
 
-			}
+                    if(typeof options.comboJS == 'undefined' || options.comboJS === true){
+                        chunk = chunk.replace('@@script', fDestName + ext + '.js');
+                    }
 
-			if(typeof options.convert2vm == "undefined" || options.convert2vm == true){
-				outputVmFile(chunk,filep);
-				sholdtidy = false;
-			}
+                    if(typeof options.comboCSS == 'undefined' || options.comboCSS === true){
+                        chunk = chunk.replace('@@style', fDestName + ext + '.css');
+                    }
 
-			if(typeof options.convert2php == "undefined" || options.convert2php == true){
-				outputPhpFile(chunk,filep);
-				sholdtidy = false;
-			}
+                }
 
-			if(sholdtidy && options.tidy){
-				chunk = tidy(chunk,{
-			      'indent_size': 4,
-			      'indent_char': ' ',
-			      'brace_style': 'expand',
-			      'unformatted': ['a', 'sub', 'sup', 'b', 'i', 'u','script']
-				});
-			}
+                if(typeof options.convert2vm == "undefined" || options.convert2vm == true){
+                    outputVmFile(chunk,filep);
+                    sholdtidy = false;
+                }
 
-			chunkParser(chunk,function(chunk){
-				if(options.mockFilter){
-					chunk = mockFilter(chunk);
-				}
-				chunk = teardownChunk(chunk,options.encoding);
-				if(!(chunk instanceof Buffer)){
-					chunk = new Buffer(chunk);
-				}
-				if(options.encoding == 'gbk'){
-					chunk = iconv.encode(iconv.decode(chunk, 'utf8'),'gbk');
-				}
-				fs.writeFileSync(v.dest,chunk);
-				done();
-			});
+                if(typeof options.convert2php == "undefined" || options.convert2php == true){
+                    outputPhpFile(chunk,filep);
+                    sholdtidy = false;
+                }
+
+                if(sholdtidy && options.tidy){
+                    chunk = tidy(chunk,{
+                        'indent_size': 4,
+                        'indent_char': ' ',
+                        'brace_style': 'expand',
+                        'unformatted': ['a', 'sub', 'sup', 'b', 'i', 'u','script']
+                    });
+                }
+
+                chunkParser(chunk,function(chunk){
+                    if(options.mockFilter){
+                        chunk = mockFilter(chunk);
+                    }
+                    chunk = teardownChunk(chunk,options.encoding);
+                    if(!(chunk instanceof Buffer)){
+                        chunk = new Buffer(chunk);
+                    }
+                    if(options.encoding == 'gbk'){
+                        chunk = iconv.encode(iconv.decode(chunk, 'utf8'),'gbk');
+                    }
+                    fs.writeFileSync(v.dest,chunk);
+                    callback();
+                });
+
+            };
+
+            asyncFns.push(asyncFn);
 			
 		});
 
-        // HTML 区块代理
-        if(options.htmlProxy){
-            HTMLFragments.process(options.htmlProxy, options.htmlProxyDestDir, done);
-        }
+        async.parallel(asyncFns, function (err, result) {
 
-        // done();
-		return;
+            if (err) {
+
+                console.warn('combohtml 生成有错误');
+                console.error(err);
+
+                done();
+
+            } else {
+
+                // HTML 区块代理
+                if(options.htmlProxy){
+                    HTMLFragments.process(options.htmlProxy, options.htmlProxyDestDir, done);
+                }
+
+            }
+
+        });
+
 	});
 
 };
