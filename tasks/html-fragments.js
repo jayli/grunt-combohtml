@@ -54,7 +54,12 @@ exports.process = function (htmlProxyConfig, outputDir, done) {
                         }
 
                         var pageContent = iconv.decode(body, responseCharset);
+						try {
                         var replacedHTML = htmlProxy.replaceDom(pageContent, proxyItem.replacements);
+						} catch(e){
+							console.log('>> fragment not found: '+ url);
+							return callback();
+						}
                         var encodedHTML = iconv.encode(tidy(replacedHTML), responseCharset);
 
                         var url2FileName = url.replace(/^http(s)?:\/\//, '').replace(/\/|\./g,'-'),
