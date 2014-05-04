@@ -77,7 +77,7 @@ function getContent(p){
 		if(os.platform().indexOf('win32') >= 0){
 			f_url = f_url.replace(/\\/ig,'/');
 		}
-		return '<!--#chunk url="'+f_url+'" -->';
+		return '--#chunk url="'+f_url+'" --';
 	} else {
 		return "<!-- " + p + " is not found! -->";
 	}

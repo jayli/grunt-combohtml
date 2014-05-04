@@ -8,7 +8,8 @@ var iconv = require('iconv-lite');
 var http = require('http');
 var joinbuffers = require('joinbuffers');
 
-var reg = '<!--#(chunk)(\\s([a-z]+)=[\'"](.+?)[\'"])* -->';
+// var reg = '<!--#(chunk)(\\s([a-z]+)=[\'"](.+?)[\'"])* -->';
+var reg = '--#(chunk)(\\s([a-z]+)=[\'"](.+?)[\'"]) --';
 
 // p：绝对路径
 // return:结果
