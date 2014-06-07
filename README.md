@@ -48,6 +48,9 @@ grunt.initConfig({
 			comboExt:'-combo', // 静态合并后的js和css后缀
 			htmlProxy: '<%= pkg.htmlProxy %>',      // htmlProxy 配置，用于产出线上页面区块替换为本地模块页面
 			htmlProxyDestDir: 'html-fragments'      // html 代理区块页面生成到的目标目录
+			meta: {
+					'pageid': '<%= pkg.name%>/${path|regexp,"pages/",""}'
+			}
 		},
 		main:{
 			files: [
@@ -65,7 +68,11 @@ grunt.initConfig({
 
 ```
 
-说明:relative和comboJS与comboCSS的配置互斥
+### 配置说明
+
+**说明:relative和comboJS与comboCSS的配置互斥**
+
+#### html-proxy html 区块代理配置
 
 其中 `htmlProxy` 的配置在 `abc.json` 中指定，这里读取配置，示例配置如下：
 
@@ -100,8 +107,11 @@ grunt.initConfig({
       }]
   }]
 ```
+#### 资源文件合并配置 
 
-合并文件提供两种模式,代码静态合并,即页面中相对路径引用的资源文件都会被抓取合并为一个:
+合并文件提供两种模式：
+
+1. 代码静态合并：即页面中相对路径引用的资源文件都会被抓取合并为一个:
 
 ```
 options:{
@@ -116,7 +126,7 @@ options:{
 }
 ```
 
-若希望页面中引用的相对路径都编译为绝对路径并组成combo的模式`http://url/??a.js,b.js`,需要开始`relative`字段,这时`comboJS`和`comboCSS`字段不起作用
+2. combo模式合并：若希望页面中引用的相对路径都编译为绝对路径并组成combo的模式`http://url/??a.js,b.js`,需要开始`relative`字段,这时`comboJS`和`comboCSS`字段不起作用
 
 ```
 options:{
@@ -133,8 +143,29 @@ options:{
 	comboMapFile:'http://g.tbcdn.cn/path/to/maps.js'
 }
 ```
+#### Juicer Mock
 
 页面中的 JuicerMock 片段可以通过`mockFilter`字段来配置,原理参照[grunt-flexcombo](http://npmjs.org/grunt-flexcombo)
+
+#### Meta 标签嵌入
+
+通过 `options` 中的 `meta` 配置，以键值对形式传入每个 `meta` 的 key 和 value，构建时会自动生成对应的一条条 `<meta>` 标签嵌入 `</head>` 前。
+
+除了可以通过 `<%=pkg.attribute %>` 读取环境变量之外，还提供了额外的环境属性，在 `meta` 中可按需配置，使用时遵循 [`Juicer`](http://juicer.name/docs/docs_zh_cn.html) 语法：
+
+- `path`：当前处理的文件路径（以 `src` 路径为起点，如 `"pages/search/index.html"` ）
+- `ts`: 时间戳
+
+此外提供一个 `Juicer` 辅助函数 `regexp`，按需对上面的环境属性进行截取或替换，如上面配置中的：
+
+``` javascript
+meta: {
+	'pageid': '<%= pkg.name%>/${path|regexp,"pages/",""}'
+}
+```
+
+代表将 `path` 中的 `pages/` 字符串替换为 ""，也就是拿掉。
+
 
 ## 执行任务
 
