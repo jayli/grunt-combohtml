@@ -70,7 +70,44 @@ grunt.initConfig({
 
 ### 配置说明
 
-**说明:relative和comboJS与comboCSS的配置互斥**
+#### 资源文件合并配置 
+
+**说明:relative 和 comboJS与comboCSS 的配置互斥！**
+
+合并文件提供两种模式：
+
+1. 代码静态合并：即页面中相对路径引用的资源文件都会被抓取合并为一个:
+
+```
+options:{
+	encoding:'utf8',
+	replacement:{
+		from:/src\//,
+		to:'build/'
+	},
+	comboJS:true, 
+	comboCSS:true,
+	comboExt:'-combo'
+}
+```
+
+2. combo模式合并：若希望页面中引用的相对路径都编译为绝对路径并组成combo的模式`http://url/??a.js,b.js`,需要开始`relative`字段,这时`comboJS`和`comboCSS`字段不起作用
+
+```
+options:{
+	encoding:'utf8',
+	replacement:{
+		from:/src\//,
+		to:'build/'
+	},
+	// 本地文件引用替换为线上地址的前缀
+	relative:'http://g.tbcdn.cn/path/to/project/',
+	// 配合relative使用,将页面中所有以CDN引用的JS/CSS文件名进行拼合
+	combineAssets: true, 
+	// KISSY Modules Maps File 地址,根据需要添加
+	comboMapFile:'http://g.tbcdn.cn/path/to/maps.js'
+}
+```
 
 #### html-proxy html 区块代理配置
 
@@ -107,42 +144,7 @@ grunt.initConfig({
       }]
   }]
 ```
-#### 资源文件合并配置 
 
-合并文件提供两种模式：
-
-1. 代码静态合并：即页面中相对路径引用的资源文件都会被抓取合并为一个:
-
-```
-options:{
-	encoding:'utf8',
-	replacement:{
-		from:/src\//,
-		to:'build/'
-	},
-	comboJS:true, 
-	comboCSS:true,
-	comboExt:'-combo'
-}
-```
-
-2. combo模式合并：若希望页面中引用的相对路径都编译为绝对路径并组成combo的模式`http://url/??a.js,b.js`,需要开始`relative`字段,这时`comboJS`和`comboCSS`字段不起作用
-
-```
-options:{
-	encoding:'utf8',
-	replacement:{
-		from:/src\//,
-		to:'build/'
-	},
-	// 本地文件引用替换为线上地址的前缀
-	relative:'http://g.tbcdn.cn/path/to/project/',
-	// 配合relative使用,将页面中所有以CDN引用的JS/CSS文件名进行拼合
-	combineAssets: true, 
-	// KISSY Modules Maps File 地址,根据需要添加
-	comboMapFile:'http://g.tbcdn.cn/path/to/maps.js'
-}
-```
 #### Juicer Mock
 
 页面中的 JuicerMock 片段可以通过`mockFilter`字段来配置,原理参照[grunt-flexcombo](http://npmjs.org/grunt-flexcombo)
@@ -156,7 +158,7 @@ options:{
 - `path`：当前处理的文件路径（以 `src` 路径为起点，如 `"pages/search/index.html"` ）
 - `ts`: 时间戳
 
-此外提供一个 `Juicer` 辅助函数 `regexp`，按需对上面的环境属性进行截取或替换，如上面配置中的：
+此外提供一个 `Juicer` 辅助函数 `regexp`，按需对上面的环境属性通过正则表达式进行截取或替换，如上面配置中的：
 
 ``` javascript
 meta: {
@@ -164,7 +166,7 @@ meta: {
 }
 ```
 
-代表将 `path` 中的 `pages/` 字符串替换为 ""，也就是拿掉。
+代表将 `path` 中的 `pages/` 正则表达式字符串替换为 ""，也就是拿掉。
 
 
 ## 执行任务
