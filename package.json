@@ -1,7 +1,7 @@
 {
   "name": "grunt-combohtml",
   "description": "combine build html with ssi.",
-  "version": "0.1.26",
+  "version": "0.1.27",
   "homepage": "https://github.com/jayli/grunt-combohtml",
   "author": {
     "name": "bachi",

@@ -70,7 +70,7 @@ function getCombinedAssets(arr){
 		}
 		source.push(arr[i].replace('http://'+baseUrl+'/',''));
 	}
-	return 'http://'+baseUrl+'/??'+source.join(',');
+	return ('http://'+baseUrl+'/??'+source.join(',')).replace('????', '??');
 }
 
 function inArray (v, a){
@@ -186,12 +186,13 @@ function getFirstIncludes(content,type){
 
 // 得到的一定是utf8编码的buffer
 function read(file){
-	var fd = fs.readFileSync(file);
+	var fd = fs.readFileSync(file),
+        bf;
 
 	if(isUtf8(fd)){
-		var bf = fs.readFileSync(file);
+		bf = fs.readFileSync(file);
 	} else {
-		var bf = iconv.encode(iconv.decode(fd, 'gbk'),'utf8');
+		bf = iconv.encode(iconv.decode(fd, 'gbk'),'utf8');
 	}
 	return bf;
 }

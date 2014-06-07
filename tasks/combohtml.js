@@ -62,7 +62,7 @@ module.exports = function(grunt) {
                 var fDestName = path.basename(v.dest,path.extname(v.dest));
                 var filep = path.join(dirname, fDestName);
 
-                var ext = '.combo';
+                var ext = '-combo';
                 if(options.comboExt != undefined && options.comboExt != null){
                     ext = options.comboExt;
                 }
@@ -84,36 +84,40 @@ module.exports = function(grunt) {
                     }
                 } else {
                     // 相对路径执行静态合并
+	                var isComboJS = !(options.comboJS == false),
+		                isComboCSS = !(options.comboCSS === false);
+
                     var result = extract.parse(chunk,{
-                        comboJS:typeof options.comboJS == 'undefined' || options.comboJS === true,
-                        comboCSS:typeof options.comboCSS == 'undefined' || options.comboCSS === true
+                        comboJS: isComboJS,
+                        comboCSS: isComboCSS
                     });
 
                     chunk = result.content;
 
-                    if(typeof options.comboJS == 'undefined' || options.comboJS === true){
+	                // 未用到？
+                    if(isComboJS){
                         var js_content = concat(result.js,dest_js,v.orig.cwd,p,options.replacement);
                     }
-                    if(typeof options.comboCSS == 'undefined' || options.comboCSS === true){
+                    if(isComboCSS){
                         var css_content = concat(result.css,dest_css,v.orig.cwd,p,options.replacement);
                     }
 
-                    if(typeof options.comboJS == 'undefined' || options.comboJS === true){
+                    if(isComboJS){
                         chunk = chunk.replace('@@script', fDestName + ext + '.js');
                     }
 
-                    if(typeof options.comboCSS == 'undefined' || options.comboCSS === true){
+                    if(isComboCSS){
                         chunk = chunk.replace('@@style', fDestName + ext + '.css');
                     }
 
                 }
 
-                if(typeof options.convert2vm == "undefined" || options.convert2vm == true){
+                if(!(options.convert2vm === false)){
                     outputVmFile(chunk,filep);
                     sholdtidy = false;
                 }
 
-                if(typeof options.convert2php == "undefined" || options.convert2php == true){
+                if(!(options.convert2php === false)){
                     outputPhpFile(chunk,filep);
                     sholdtidy = false;
                 }
@@ -125,6 +129,12 @@ module.exports = function(grunt) {
                         'brace_style': 'expand',
                         'unformatted': ['a', 'sub', 'sup', 'b', 'i', 'u','script']
                     });
+                }
+
+                // meta 配置处理，加入到 </head> 前
+                if(options.meta){
+                    var metaElements = genMetas(options.meta, v.dest);
+                    chunk = chunk.replace(/<\/head>/i, metaElements + '</head>');
                 }
 
                 chunkParser(chunk,function(chunk){
@@ -173,6 +183,62 @@ module.exports = function(grunt) {
 	});
 
 };
+
+/**
+ * 生成 meta 元素
+ * @param metaConfig 用户传入的 meta 键值对配置
+ * @param filePath 待处理文件路径
+ * @returns {string} 各个 meta 拼接后的字符串
+ */
+function genMetas (metaConfig, filePath) {
+
+	/**
+	 * 注册 regexp 辅助函数，通过正则自定义输出
+	 */
+	Juicer.register('regexp', function (value, regexp, replacement){
+		regexp = new RegExp(regexp, 'igm');
+		return value.replace(regexp, replacement);
+	});
+
+    var ret = [],
+        ts = +new Date,
+	    // 目前提供的可用变量
+        metaReplacements = {
+            'path': filePath.replace('build/', ''),     // 文件路径
+            'ts': ts                                    // 时间戳
+        },
+        metaTpl = Juicer('<meta name="${metaKey}" content="${metaValue}">'),
+	    platform = process.platform,
+	    ctrlChar;
+
+	// 根据操作提供选择合适的换行控制符
+	if(platform == 'win32'){
+		// Windows
+		ctrlChar = '\n';
+	} else if(platform == 'darwin'){
+		// Mac OS
+		ctrlChar = '\r';
+	} else {
+		// 否则视为 Linux
+		ctrlChar = '\r\n';
+	}
+
+	// 遍历各个 meta Key
+    for(var metaKey in metaConfig) {
+        if(metaConfig.hasOwnProperty(metaKey)){
+            var metaValue = metaConfig[metaKey];
+            metaValue = Juicer(metaValue + '', metaReplacements);
+            var metaStr = metaTpl.render({
+                metaKey: metaKey,
+                metaValue: metaValue
+            });
+            ret.push('\t' + metaStr);
+        }
+    }
+
+    return ret.join(ctrlChar) + ctrlChar;
+
+}
 
 // 传入的chunk一定是utf8的
 function teardownChunk(chunk,encoding){
@@ -255,12 +321,13 @@ function isFile(dir){
 
 // 得到的一定是utf8编码的buffer
 function read(file){
-	var fd = fs.readFileSync(file);
+	var fd = fs.readFileSync(file),
+        bf;
 
 	if(isUtf8(fd)){
-		var bf = fs.readFileSync(file);
+		bf = fs.readFileSync(file);
 	} else {
-		var bf = iconv.encode(iconv.decode(fd, 'gbk'),'utf8');
+		bf = iconv.encode(iconv.decode(fd, 'gbk'),'utf8');
 	}
 	return bf;
 }
