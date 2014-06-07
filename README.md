@@ -12,7 +12,7 @@ HTML代码的构建,合并SSI,并提取其中引用的本地css和js，执行动
 npm install grunt-combohtml --save-dev
 ```
 
-安装后，在Gruntfile.js中载入任务
+安装后，在 Gruntfile.js 中载入任务
 
 ```js
 grunt.loadNpmTasks('grunt-combohtml');
@@ -22,7 +22,7 @@ grunt.loadNpmTasks('grunt-combohtml');
 
 ### 步骤
 
-在`grunt.initConfig()`中添加combohtml的配置：
+在 `grunt.initConfig()` 中添加 combohtml 的配置：
 
 ```js
 grunt.initConfig({
@@ -49,7 +49,7 @@ grunt.initConfig({
 			htmlProxy: '<%= pkg.htmlProxy %>',      // htmlProxy 配置，用于产出线上页面区块替换为本地模块页面
 			htmlProxyDestDir: 'html-fragments'      // html 代理区块页面生成到的目标目录
 			meta: {
-					'pageid': '<%= pkg.name%>/${path|regexp,"pages/",""}'
+				'pageid': '<%= pkg.name%>/${path|regexp,"pages/",""}'
 			}
 		},
 		main:{
@@ -65,7 +65,6 @@ grunt.initConfig({
 		}
 	}
 });
-
 ```
 
 ### 配置说明
@@ -78,36 +77,36 @@ grunt.initConfig({
 
 1. 代码静态合并：即页面中相对路径引用的资源文件都会被抓取合并为一个:
 
-```
-options:{
-	encoding:'utf8',
-	replacement:{
-		from:/src\//,
-		to:'build/'
-	},
-	comboJS:true, 
-	comboCSS:true,
-	comboExt:'-combo'
-}
-```
+	```
+	options:{
+		encoding:'utf8',
+		replacement:{
+			from:/src\//,
+			to:'build/'
+		},
+		comboJS:true, 
+		comboCSS:true,
+		comboExt:'-combo'
+	}
+	```
 
 2. combo模式合并：若希望页面中引用的相对路径都编译为绝对路径并组成combo的模式`http://url/??a.js,b.js`,需要开始`relative`字段,这时`comboJS`和`comboCSS`字段不起作用
 
-```
-options:{
-	encoding:'utf8',
-	replacement:{
-		from:/src\//,
-		to:'build/'
-	},
-	// 本地文件引用替换为线上地址的前缀
-	relative:'http://g.tbcdn.cn/path/to/project/',
-	// 配合relative使用,将页面中所有以CDN引用的JS/CSS文件名进行拼合
-	combineAssets: true, 
-	// KISSY Modules Maps File 地址,根据需要添加
-	comboMapFile:'http://g.tbcdn.cn/path/to/maps.js'
-}
-```
+	``` javascript
+	options:{
+		encoding:'utf8',
+		replacement:{
+			from:/src\//,
+			to:'build/'
+		},
+		// 本地文件引用替换为线上地址的前缀
+		relative:'http://g.tbcdn.cn/path/to/project/',
+		// 配合relative使用,将页面中所有以CDN引用的JS/CSS文件名进行拼合
+		combineAssets: true, 
+		// KISSY Modules Maps File 地址,根据需要添加
+		comboMapFile:'http://g.tbcdn.cn/path/to/maps.js'
+	}
+	```
 
 #### html-proxy html 区块代理配置
 
