@@ -76,41 +76,43 @@ module.exports = function(grunt) {
                 var chunk = ssiChunk(p,bf.toString('utf8'));
 
                 // TODO: 这里的逻辑需要重构了
-                if(typeof options.relative !== "undefined"){
-                    // 相对路径编译成绝对路径
-                    chunk = relativeParse(chunk,options.relative,filep).content;
-                    if(options.combineAssets){
-                        chunk = combineAssets(chunk,comboMapFile).content;
-                    }
-                } else {
-                    // 相对路径执行静态合并
-	                var isComboJS = !(options.comboJS == false),
-		                isComboCSS = !(options.comboCSS === false);
+				// 需要处理js路径
+				if(typeof options.assetseParser == 'undefined' || (typeof options.assetseParser == 'undefined' && options.assetseParser !== false)){
+					if(typeof options.relative !== "undefined"){
+						// 相对路径编译成绝对路径
+						chunk = relativeParse(chunk,options.relative,filep).content;
+						if(options.combineAssets){
+							chunk = combineAssets(chunk,comboMapFile).content;
+						}
+					} else {
+						// 相对路径执行静态合并
+						var isComboJS = !(options.comboJS == false),
+							isComboCSS = !(options.comboCSS === false);
 
-                    var result = extract.parse(chunk,{
-                        comboJS: isComboJS,
-                        comboCSS: isComboCSS
-                    });
+						var result = extract.parse(chunk,{
+							comboJS: isComboJS,
+							comboCSS: isComboCSS
+						});
 
-                    chunk = result.content;
+						chunk = result.content;
 
-	                // 未用到？
-                    if(isComboJS){
-                        var js_content = concat(result.js,dest_js,v.orig.cwd,p,options.replacement);
-                    }
-                    if(isComboCSS){
-                        var css_content = concat(result.css,dest_css,v.orig.cwd,p,options.replacement);
-                    }
+						// 未用到？
+						if(isComboJS){
+							var js_content = concat(result.js,dest_js,v.orig.cwd,p,options.replacement);
+						}
+						if(isComboCSS){
+							var css_content = concat(result.css,dest_css,v.orig.cwd,p,options.replacement);
+						}
 
-                    if(isComboJS){
-                        chunk = chunk.replace('@@script', fDestName + ext + '.js');
-                    }
+						if(isComboJS){
+							chunk = chunk.replace('@@script', fDestName + ext + '.js');
+						}
 
-                    if(isComboCSS){
-                        chunk = chunk.replace('@@style', fDestName + ext + '.css');
-                    }
-
-                }
+						if(isComboCSS){
+							chunk = chunk.replace('@@style', fDestName + ext + '.css');
+						}
+					}
+				}
 
                 if(!(options.convert2vm === false)){
                     outputVmFile(chunk,filep);

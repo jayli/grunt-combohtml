@@ -1,7 +1,7 @@
 {
   "name": "grunt-combohtml",
   "description": "combine build html with ssi.",
-  "version": "0.1.28",
+  "version": "0.1.29",
   "homepage": "https://github.com/jayli/grunt-combohtml",
   "author": {
     "name": "bachi",
@@ -43,11 +43,14 @@
     "gruntplugin"
   ],
   "readmeFilename": "README.md",
-  "_id": "grunt-combohtml@0.1.21",
+  "_id": "grunt-combohtml@0.1.28",
   "_from": "grunt-combohtml@",
   "dist": {
     "shasum": "ecf31988faa90dc8dc65d2d6bf2c4db48e639cd3"
   },
   "readme": "# grunt-combohtml\n\nHTML代码的构建,合并SSI,并提取其中引用的本地css和js，执行动态和静态合并,并输出构建好的html\n\n## Getting Started\n\n依赖 Grunt 版本`~0.4.1`\n\n安装\n\n```shell\nnpm install grunt-combohtml --save-dev\n```\n\n安装后，在Gruntfile.js中载入任务\n\n```js\ngrunt.loadNpmTasks('grunt-combohtml');\n```\n\n## 任务配置\n\n### 步骤\n\n在`grunt.initConfig()`中添加combohtml的配置：\n\n```js\ngrunt.initConfig({\n\tcombohtml:{\n\t\toptions:{\n\t\t\tencoding:'utf8',\n\t\t\treplacement:{\n\t\t\t\tfrom:/src\\//,\n\t\t\t\tto:'build/'\n\t\t\t},\n\t\t\t// 本地文件引用替换为线上地址的前缀\n\t\t\trelative:'http://g.tbcdn.cn/path/to/project/',\n\t\t\t// 配合relative使用,将页面中所有以CDN引用的JS/CSS文件名进行拼合\n\t\t\tcombineAssets: true, \n\t\t\t// KISSY Modules Maps File 地址\n\t\t\tcomboMapFile:'http://g.tbcdn.cn/path/to/maps.js',\n\t\t\ttidy:false,  // 是否重新格式化HTML\n\t\t\tmockFilter:true, // 是否过滤Demo中的JuicerMock\n\t\t\tcomboJS:false, // 是否静态合并当前页面引用的本地js为一个文件\n\t\t\tcomboCSS:false, // 是否静态合并当前页面引用的css为一个文件\n\t\t\tconvert2vm:false,// 是否将juicer语法块转换为vm格式\n\t\t\tconvert2php:false, // 是否将juicer语法块转换为php格式\n\t\t\tcomboExt:'-combo' // 静态合并后的js和css后缀\n\t\t},\n\t\tmain:{\n\t\t\tfiles: [\n\t\t\t\t{\n\t\t\t\t\texpand: true,\n\t\t\t\t\tcwd:'build',\n\t\t\t\t\t// 对'*.php'文件进行HTML合并解析\n\t\t\t\t\tsrc: ['**/*.php'],\n\t\t\t\t\tdest: 'build/'\n\t\t\t\t}\n\t\t\t]\n\t\t}\n\t}\n});\n\n```\n\n说明:relative和comboJS与comboCSS的配置互斥\n\n合并文件提供两种模式,代码静态合并,即页面中相对路径引用的资源文件都会被抓取合并为一个:\n\n```\noptions:{\n\tencoding:'utf8',\n\treplacement:{\n\t\tfrom:/src\\//,\n\t\tto:'build/'\n\t},\n\tcomboJS:true, \n\tcomboCSS:true,\n\tcomboExt:'-combo'\n}\n```\n\n若希望页面中引用的相对路径都编译为绝对路径并组成combo的模式`http://url/??a.js,b.js`,需要开始`relative`字段,这时`comboJS`和`comboCSS`字段不起作用\n\n```\noptions:{\n\tencoding:'utf8',\n\treplacement:{\n\t\tfrom:/src\\//,\n\t\tto:'build/'\n\t},\n\t// 本地文件引用替换为线上地址的前缀\n\trelative:'http://g.tbcdn.cn/path/to/project/',\n\t// 配合relative使用,将页面中所有以CDN引用的JS/CSS文件名进行拼合\n\tcombineAssets: true, \n\t// KISSY Modules Maps File 地址,根据需要添加\n\tcomboMapFile:'http://g.tbcdn.cn/path/to/maps.js'\n}\n```\n\n页面中的 JuicerMock 片段可以通过`mockFilter`字段来配置,原理参照[grunt-flexcombo](http://npmjs.org/grunt-flexcombo)\n\n## 执行任务\n\n\ttask.run(['combohtml']);\n\n## 功能说明\n\n### SSI \n\n该服务依赖[jayli-server](https://npmjs.org/package/jayli-server)，支持标准格式的 SSI include\n\n\t<!--#include virtual=\"file.html\" -->\n\n",
-  "_resolved": "https://registry.npmjs.org/grunt-combohtml/-/grunt-combohtml-0.1.18.tgz"
+  "_resolved": "https://registry.npmjs.org/grunt-combohtml/-/grunt-combohtml-0.1.18.tgz",
+  "bugs": {
+    "url": "https://github.com/jayli/grunt-combohtml/issues"
+  }
 }
