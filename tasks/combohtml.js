@@ -31,9 +31,10 @@ function mockFilter(chunk){
 	if(mock.checkDef(chunk)){
 		var pageParam = mock.getMockData(chunk);
 		chunk = Juicer(chunk, pageParam);
-		// chunk = delPageParamArea(chunk);
+		chunk = mock.delPageParamArea(chunk);
 		chunk = tidy(chunk);
 	}
+	chunk = mock.delPageParamArea(chunk);
 	return chunk;
 }
 
