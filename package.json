@@ -1,7 +1,7 @@
 {
   "name": "grunt-combohtml",
   "description": "combine build html with ssi.",
-  "version": "0.1.30",
+  "version": "0.1.31",
   "homepage": "https://github.com/jayli/grunt-combohtml",
   "author": {
     "name": "bachi",
@@ -29,7 +29,6 @@
   },
   "dependencies": {
     "async": "^0.7.0",
-    "civet": "",
     "html-proxy": "",
     "iconv-lite": "",
     "joinbuffers": "~0.1.1",
