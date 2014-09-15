@@ -1,11 +1,11 @@
 /* index
  * xudafeng@126.com
  */
-var lexicalParse = require('./lib/lexicalParse').lexicalParse;
-var syntaxParse = require('./lib/syntaxParse').syntaxParse;
-var convert2vm = require('./lib/convert2vm').convert2vm;
-var convert2php = require('./lib/convert2php').convert2php;
-var expsParse = require('./lib/expsParse').expsParse;
+var lexicalParse = require('./lexicalParse').lexicalParse;
+var syntaxParse = require('./syntaxParse').syntaxParse;
+var convert2vm = require('./convert2vm').convert2vm;
+var convert2php = require('./convert2php').convert2php;
+var expsParse = require('./expsParse').expsParse;
 var passme = require('passme');
 /**
  * juicer2vm，把一段juicer文本转换为vm文本。
