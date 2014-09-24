@@ -141,7 +141,7 @@ module.exports = function (grunt) {
 				if(that.target == 'offline') {
 					// 离线包任务定制
 					var tmsPrefix = 'trip.taobao.com/go/';
-					var tms_include = '<!--TMS:([^,]+),(utf-8|utf8|gbk|gb2312):TMS-->';
+					var tms_include = '<!--TMS:([^,]+),(utf-8|utf8|gbk|gb2312),([0-9]*):TMS-->';
 					chunk = chunk.replace(new RegExp(tms_include, 'ig'),function(fullMatch, tmsPath, encoding){
 						return '<!--HTTP:http://' + path.join(tmsPrefix, tmsPath) + ',' + encoding + ':HTTP-->';
 					});
