@@ -15,6 +15,7 @@ var CONTENT = '';
 var comboJS = true;
 var comboCSS = true;
 
+// a.js?nocombo=true 的请求都过滤掉，不做合并
 /*
 var x = read('xx.html');
 console.log(parse(x.toString('utf8')));
@@ -32,9 +33,20 @@ function parse(content,o){
 	content = js(content);
 	return {
 		content:insertScript(recall(content)),
-		js:distinct(JS_Files),
-		css:distinct(CSS_Files)
+		js:cleanUpNoComboFiles(distinct(JS_Files)),
+		css:cleanUpNoComboFiles(distinct(CSS_Files))
 	};
+}
+
+// 将数组中带有nocombo=true的问题都清除掉
+function cleanUpNoComboFiles(flist){
+	var a = [];
+	flist.forEach(function(item){
+		if(!/nocombo=true/i.test(item)){
+			a.push(item);
+		}
+	});
+	return a;
 }
 
 function inArray (v, a){
@@ -84,9 +96,11 @@ function insertScript(content){
 
 function recall(content){
 
+	// http 请求都完全恢复
+	// nocombo=true的请求也完全恢复
 	content = content.replace(new RegExp('(<!--css:([^>]*?)-->)','gi'),function(){
 		var args = arguments;
-		if(/http:/i.test(args[2]) || comboCSS === false){
+		if(/http:/i.test(args[2]) || comboCSS === false || /nocombo=true/i.test(args[2])){
 			if(/\.ico$/i.test(args[2])){
 				return '<link type="image/x-icon" rel="shortcut icon" href="'+args[2]+'" />';
 			}
@@ -96,9 +110,11 @@ function recall(content){
 		}
 	});
 
+	// http 请求都完全恢复
+	// nocombo=true的请求也完全恢复
 	content = content.replace(new RegExp('(<!--js:([^>]*?)-->)','gi'),function(){
 		var args = arguments;
-		if(/http:/i.test(args[2]) || comboJS === false){
+		if(/http:/i.test(args[2]) || comboJS === false || /nocombo=true/i.test(args[2])){
 			return '<script src="'+args[2]+'"></script>';
 		} else {
 			return args[0];

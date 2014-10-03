@@ -90,6 +90,8 @@ grunt.initConfig({
 	}
 	```
 
+如果html中引用js和css时带有`?nocombo=true`参数，则不合并
+
 2. combo模式合并：若希望页面中引用的相对路径都编译为绝对路径并组成combo的模式`http://url/??a.js,b.js`,需要开始`relative`字段,这时`comboJS`和`comboCSS`字段不起作用
 
 	``` javascript
