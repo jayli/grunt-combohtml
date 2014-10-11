@@ -38,11 +38,26 @@ function parse(content, comboMapFile, o) {
 	}
 	var combinedJS = getCombinedAssets(JS_Files);
 	var combinedCSS = getCombinedAssets(CSS_Files);
+
+	try {
+		JS_Files = teardownParams(JS_Files);
+		CSS_Files = teardownParams(CSS_Files);
+	} catch(e){}
+
+	console.log(JS_Files);
+
 	return {
 		content: insertScript(recall(content), combinedJS, combinedCSS),
 		js: distinct(JS_Files),
 		css: distinct(CSS_Files)
 	};
+}
+
+function teardownParams(a){
+	for(var i = 0;i<a.length;i++){
+		a[i] = a[i].replace(/\?nocombo=(true|false)/i,'');
+	}
+	return a;
 }
 
 function insertComboMapFile(jss, comboFile) {
