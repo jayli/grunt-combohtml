@@ -36,15 +36,15 @@ function parse(content, comboMapFile, o) {
 	if (comboMapFile) {
 		JS_Files = insertComboMapFile(JS_Files, comboMapFile);
 	}
-	var combinedJS = getCombinedAssets(JS_Files);
-	var combinedCSS = getCombinedAssets(CSS_Files);
 
 	try {
 		JS_Files = teardownParams(JS_Files);
 		CSS_Files = teardownParams(CSS_Files);
 	} catch(e){}
 
-	console.log(JS_Files);
+	var combinedJS = getCombinedAssets(JS_Files);
+	var combinedCSS = getCombinedAssets(CSS_Files);
+
 
 	return {
 		content: insertScript(recall(content), combinedJS, combinedCSS),
