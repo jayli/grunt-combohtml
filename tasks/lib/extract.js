@@ -83,11 +83,11 @@ function distinct(A){
 function insertScript(content){
 	return content.replace(/<\/head>/i,function(){
 		var comboStr = '';
-		if(comboJS){
-			comboStr += '<!--comboJS--><script src="@@script"></script>\n';
-		}
 		if(comboCSS){
 			comboStr += '<!--comboCSS--><link href="@@style" rel="stylesheet" />\n';
+		}
+		if(comboJS){
+			comboStr += '<!--comboJS--><script src="@@script"></script>\n';
 		}
 		comboStr += '</head>';
 		return comboStr;

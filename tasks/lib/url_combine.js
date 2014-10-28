@@ -122,11 +122,11 @@ function distinct(A) {
 function insertScript(content, js, css) {
 	return content.replace(/(<script\s|<\/head>)/i, function () {
 		var comboStr = '';
-		if (comboJS) {
-			comboStr += '<script src="' + js + '"></script>\n';
-		}
 		if (comboCSS) {
 			comboStr += '<link href="' + css + '" rel="stylesheet" />\n';
+		}
+		if (comboJS) {
+			comboStr += '<script src="' + js + '"></script>\n';
 		}
 		comboStr += arguments[0];
 		return comboStr;
