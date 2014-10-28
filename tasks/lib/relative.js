@@ -149,7 +149,7 @@ function getFirstIncludes(content, type, relative, filep) {
                     var alp = relative +
                         path.join(path.dirname(filep).
                                 split(path.sep).join('/').replace(/^build\//, ''),
-                            args[1].replace(/\.js$/, '-min.js')).split(path.sep).join('/');
+                            args[1].replace(/(\.js$|\.js\?[^?.]+$)/, '-min.js')).split(path.sep).join('/');
                     str = '<!--js:' + alp + '-->';
                 } else {
                     str = '<!--js:' + args[1] + '-->';
@@ -160,7 +160,7 @@ function getFirstIncludes(content, type, relative, filep) {
                     var alp = relative +
                         path.join(path.dirname(filep).
                                 split(path.sep).join('/').replace(/^build\//, ''),
-                            args[1].replace(/\.css$/, '-min.css')).split(path.sep).join('/');
+                            args[1].replace(/(\.css$|\.css\?[^\?]+$)/, '-min.css')).split(path.sep).join('/');
                     str = '<!--css:' + alp + '-->';
                 } else {
                     str = '{!--link:' + args[0].replace('<link', '!link') + '--}';
