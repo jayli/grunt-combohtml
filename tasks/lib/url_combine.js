@@ -85,7 +85,7 @@ function getCombinedAssets(arr) {
 		}
 		source.push(arr[i].replace('http://' + baseUrl + '/', ''));
 	}
-	return ('http://' + baseUrl + '/??' + source.join(',')).replace('????', '??');
+	return (source.length > 0) ? ('http://' + baseUrl + '/??' + source.join(',')).replace('????', '??') : '';
 }
 
 function inArray(v, a) {
@@ -122,10 +122,10 @@ function distinct(A) {
 function insertScript(content, js, css) {
 	return content.replace(/(<script\s|<\/head>)/i, function () {
 		var comboStr = '';
-		if (comboCSS) {
+		if (comboCSS && css) {
 			comboStr += '<link href="' + css + '" rel="stylesheet" />\n';
 		}
-		if (comboJS) {
+		if (comboJS && js) {
 			comboStr += '<script src="' + js + '"></script>\n';
 		}
 		comboStr += arguments[0];
@@ -215,4 +215,3 @@ function read(file) {
 exports.js = js;
 exports.css = css;
 exports.parse = parse;
-
