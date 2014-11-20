@@ -132,10 +132,10 @@ function insertScript(content, js, css) {
 	return content.replace(/(<script\s|<\/head>)/i, function () {
 		var comboStr = '';
 		if (comboCSS && css) {
-			comboStr += '<link href="' + css + '" rel="stylesheet" />\n';
+			comboStr += '<link tag="combocss" href="' + css + '" rel="stylesheet" />\n';
 		}
 		if (comboJS && js) {
-			comboStr += '<script src="' + js + '"></script>\n';
+			comboStr += '<script tag="combojs" src="' + js + '"></script>\n';
 		}
 		comboStr += arguments[0];
 		return comboStr;
