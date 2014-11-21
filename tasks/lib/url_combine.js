@@ -82,16 +82,18 @@ function getCombinedAssets(arr) {
 
 	var toReplacedPrefix = 'http://' + baseUrl + '/';
 	arr.forEach(function(jsPath, idx){
-		if(jsPath.indexOf('??') != -1) {
-			// 如果该 js 引用中已经包含 combo，需要先解开 combo
-			var subComboParsed = jsPath.split('??');
-			var prefix = subComboParsed[0].replace(toReplacedPrefix, '');
-			var subComboAssets = subComboParsed[1].split(',');
-			subComboAssets.forEach(function(subComboAsset){
-				source.push(path.join(prefix, subComboAsset));
-			});
-		} else {
-			source.push(jsPath.replace(toReplacedPrefix, ''));
+		if (jsPath.indexOf(baseUrl) != -1) {
+			if (jsPath.indexOf('??') != -1) {
+				// 如果该 js 引用中已经包含 combo，需要先解开 combo
+				var subComboParsed = jsPath.split('??');
+				var prefix = subComboParsed[0].replace(toReplacedPrefix, '');
+				var subComboAssets = subComboParsed[1].split(',');
+				subComboAssets.forEach(function (subComboAsset) {
+					source.push(path.join(prefix, subComboAsset));
+				});
+			} else {
+				source.push(jsPath.replace(toReplacedPrefix, ''));
+			}
 		}
 	});
 	return (source.length > 0) ? ('http://' + baseUrl + '/??' + source.join(',')).replace('????', '??') : '';
