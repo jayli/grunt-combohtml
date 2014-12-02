@@ -146,10 +146,16 @@ function getFirstIncludes(content, type, relative, filep) {
             var str = '';
             if (type === 'js') {
                 if (!/http:/i.test(args[1])) {
-                    var alp = relative +
+                    var alp;
+                    if(/^\//.test(args[1])) {
+                        // 如果以 '/xxxx' 的绝对路径开头，从 relative 简单拼接，然后借助 replace 任务可定制替换来修复
+                        alp = relative.replace(/\/$/, '') + args[1];
+                    } else {
+                        alp = relative +
                         path.join(path.dirname(filep).
-                                split(path.sep).join('/').replace(/^build\//, ''),
-                            args[1].replace(/(\.js$|\.js\?[^?.]+$)/, '-min.js')).split(path.sep).join('/');
+                            split(path.sep).join('/').replace(/^build\//, ''),
+                          args[1].replace(/(\.js$|\.js\?[^?.]+$)/, '-min.js')).split(path.sep).join('/');
+                    }
                     str = '<!--js:' + alp + '-->';
                 } else {
                     str = '<!--js:' + args[1] + '-->';
