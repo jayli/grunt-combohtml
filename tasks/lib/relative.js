@@ -21,7 +21,7 @@ var CONTENT = '';
  */
 
 function parse(content, relative, filep) {
-    var relative = relative || '';
+    relative = relative || '';
     CONTENT = '';
     JS_Files = [];
     CSS_Files = [];

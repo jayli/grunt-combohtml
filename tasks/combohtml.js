@@ -95,21 +95,26 @@ module.exports = function (grunt) {
 
 						chunk = result.content;
 
-						// 未用到？
-						if (isComboJS) {
-							var js_content = concat(result.js, dest_js, v.orig.cwd, p, options.replacement);
-						}
-						if (isComboCSS) {
-							var css_content = concat(result.css, dest_css, v.orig.cwd, p, options.replacement);
-						}
+						var resultJs = result.js,
+							resultCss = result.css;
+						if (isComboJS && resultJs.length > 0) {
 
-						if (isComboJS) {
+							// resultJs 不为空时才处理
+							concat(resultJs, dest_js, v.orig.cwd, p, options.replacement);
 							chunk = chunk.replace('@@script', fDestName + ext + '.js');
+						} else {
+							chunk = chunk.replace('<!--comboJS--><script src="@@script"></script>\n', '');
 						}
 
-						if (isComboCSS) {
-							chunk = chunk.replace('@@style', fDestName + ext + '.css');
+						if (isComboCSS && resultCss.length > 0) {
+
+							// resultCss 不为空时才处理
+							concat(resultCss, dest_css, v.orig.cwd, p, options.replacement);
+							chunk = chunk.replace('@@script', fDestName + ext + '.js');
+						} else {
+							chunk = chunk.replace('<!--comboCSS--><link href="@@style" rel="stylesheet" />\n', '');
 						}
+
 					}
 				}
 
