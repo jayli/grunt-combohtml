@@ -110,7 +110,7 @@ module.exports = function (grunt) {
 
 							// resultCss 不为空时才处理
 							concat(resultCss, dest_css, v.orig.cwd, p, options.replacement);
-							chunk = chunk.replace('@@script', fDestName + ext + '.js');
+							chunk = chunk.replace('@@style', fDestName + ext + '.css');
 						} else {
 							chunk = chunk.replace('<!--comboCSS--><link href="@@style" rel="stylesheet" />\n', '');
 						}
